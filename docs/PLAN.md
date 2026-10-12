@@ -87,6 +87,16 @@ Done when: forecast has 69 rows (23 units x 3 models) within bounds; every numbe
 in evaluation.md matches metrics.csv; README commands work in a new terminal;
 `python run.py` finishes in under 5 minutes.
 
+## T05b Source gaps as time periods
+Scope: apply D-11 in `labels.py`, replacing the zero-record-date rule; list every
+detected gap (start, end, hours) in the panel summary and in evaluation.md;
+regenerate panel, backtest and report. In report charts, do not draw lines across
+excluded dates. In evaluation.md tables, round counts to 3 decimals and minutes to
+1 decimal.
+Done when: a synthetic test shows a gap from 06:00 on day 1 to 15:00 on day 3 makes
+days 1-3 incomplete; earlier tests unchanged; detected gaps printed; the new test
+window printed; `python run.py` finishes in under 5 minutes.
+
 ## T06 Model C
 Scope: C1 and C2 as SPEC §8 in `models.py` and `backtest.py`; a model C section in
 `evaluation.md` with a verdict that respects the bootstrap interval.

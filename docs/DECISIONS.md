@@ -61,3 +61,10 @@ D = the first date after the last complete date; cutoff C(D) = 00:00 Europe/Kyiv
 Built exactly like a backtest prediction (models refit on all complete dates < D);
 records after C(D) are ignored. One row per unit and model (A1, A2, B). Reason: this
 is the validated procedure; the partial day after the snapshot is not used.
+
+## D-11 Source gaps as time periods — Accepted
+A source gap is any period longer than 12 hours in which no record starts anywhere
+in the official data. Every unit-day overlapping a gap is incomplete. Replaces the
+zero-record-date rule from T02. Evidence: records stop around 2026-08-29 05:30 UTC
+and resume around 2026-09-02 15:00 UTC; the border days were partly observed but
+counted as complete, with mean counts of about 1.4 and 1.8 against a typical 3-5.

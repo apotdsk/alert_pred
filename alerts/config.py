@@ -18,10 +18,12 @@ REFORM_DATES_PATH = Path("data/processed/reform_dates.csv")
 BACKTEST_PREDICTIONS_PATH = Path("outputs/backtest_predictions.csv")
 METRICS_PATH = Path("outputs/metrics.csv")
 DAILY_METRICS_PATH = Path("outputs/daily_metrics.csv")
+EVALUATION_PATH = Path("outputs/evaluation.md")
 EPISODE_MERGE_TOLERANCE_SECONDS = 60
 BUSINESS_START_HOUR = 6
 BUSINESS_END_HOUR = 22
 BOOTSTRAP_RESAMPLES = 1000
+SOURCE_GAP_DESCRIPTION = "2026-08-30 through 2026-09-01"
 KHERSON_LIBERATION_DATE = "2022-11-11"
 FRONTLINE_UNITS = ("Donetsk", "Kharkiv", "Sumy", "Zaporizhzhia")
 

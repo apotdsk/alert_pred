@@ -16,6 +16,7 @@ from alerts.data import acquire_sources, build_audit, clean_official, load_offic
 from alerts.episodes import build_all_episodes, build_episodes, select_unit_records
 from alerts.features import build_features
 from alerts.labels import build_panel, compute_reform_dates, invariant_violations
+from alerts.report import build_evaluation, build_forecast
 
 
 STAGES = ("audit", "panel", "backtest", "forecast", "report")
@@ -75,6 +76,22 @@ def run_backtest(raw_path: str | None = None) -> dict[str, object]:
     return {"validation_dates": validation_dates, "test_dates": test_dates,
             "predictions": len(predictions), "metrics": len(metrics),
             "daily_metrics": len(daily_metrics)}
+
+
+def run_forecast(raw_path: str | None = None) -> dict[str, object]:
+    """Build and save the D-10 live forecast."""
+    source, _, panel, _ = _panel_data(raw_path)
+    forecast, path = build_forecast(panel, source, compute_reform_dates(source))
+    print(f"forecast: {path}; {len(forecast)} rows; date: {forecast['forecast_date'].iloc[0]}")
+    return {"path": path, "rows": len(forecast)}
+
+
+def run_report(raw_path: str | None = None) -> dict[str, object]:
+    """Create the evaluation report and its three charts."""
+    source, _, _, _ = _panel_data(raw_path)
+    path = build_evaluation(source)
+    print(f"report: {path}; 3 evaluation charts")
+    return {"path": path, "charts": 3}
 
 
 def inspect_unit_day(unit: str, day: str, raw_path: str | None = None) -> None:
@@ -139,8 +156,16 @@ def main(argv: Sequence[str] | None = None) -> int:
                 run_backtest(args.raw_path)
             else:
                 print(stage)
-        else:
-            print(stage)
+        elif stage == "forecast":
+            if args.raw_path is None or isinstance(args.raw_path, (str, Path)):
+                run_forecast(args.raw_path)
+            else:
+                print(stage)
+        elif stage == "report":
+            if args.raw_path is None or isinstance(args.raw_path, (str, Path)):
+                run_report(args.raw_path)
+            else:
+                print(stage)
     return 0
 
 

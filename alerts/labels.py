@@ -7,8 +7,8 @@ from datetime import date
 import numpy as np
 import pandas as pd
 
-from alerts.config import (BUSINESS_END_HOUR, BUSINESS_START_HOUR, LOCAL_TIMEZONE,
-                           UNIT_AREAS)
+from alerts.config import (BUSINESS_END_HOUR, BUSINESS_START_HOUR,
+                           KHERSON_LIBERATION_DATE, LOCAL_TIMEZONE, UNIT_AREAS)
 from alerts.episodes import unit_record_mask
 
 
@@ -118,6 +118,9 @@ def build_panel(episodes: pd.DataFrame, source: pd.DataFrame,
     panel[["has_imputed_end", "has_open_end"]] = panel[
         ["has_imputed_end", "has_open_end"]].fillna(False).astype(bool)
     panel["complete"] = ~panel["date"].isin(gaps) & ~panel["has_open_end"]
+    occupied_kherson = panel["unit"].eq("Kherson") & (
+        pd.to_datetime(panel["date"]) < pd.Timestamp(KHERSON_LIBERATION_DATE))
+    panel.loc[occupied_kherson, "complete"] = False
     panel.loc[~panel["complete"], numeric] = np.nan
     panel = panel.drop(columns="has_open_end")
     return panel[["date", "unit", *numeric, "complete", "has_imputed_end"]], gaps

@@ -15,9 +15,15 @@ EDA_NOTES_PATH = Path("outputs/eda_notes.md")
 FIGURES_DIR = Path("outputs/figures")
 PANEL_PATH = Path("data/processed/panel.csv")
 REFORM_DATES_PATH = Path("data/processed/reform_dates.csv")
+BACKTEST_PREDICTIONS_PATH = Path("outputs/backtest_predictions.csv")
+METRICS_PATH = Path("outputs/metrics.csv")
+DAILY_METRICS_PATH = Path("outputs/daily_metrics.csv")
 EPISODE_MERGE_TOLERANCE_SECONDS = 60
 BUSINESS_START_HOUR = 6
 BUSINESS_END_HOUR = 22
+BOOTSTRAP_RESAMPLES = 1000
+KHERSON_LIBERATION_DATE = "2022-11-11"
+FRONTLINE_UNITS = ("Donetsk", "Kharkiv", "Sumy", "Zaporizhzhia")
 
 # Exactly 23 forecast units. Values are exact source oblast and capital-name stem.
 # Kyiv City and Kyiv oblast share the Kyiv forecast, but only Kyiv City records feed it.

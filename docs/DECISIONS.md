@@ -55,3 +55,9 @@ training and evaluation.
 Metrics are reported overall and separately for the frontline group (Donetsk,
 Kharkiv, Sumy, Zaporizhzhia) and the other 19 units. Reason: the frontline units
 approach the 1440-minute ceiling and would otherwise dominate pooled MAE.
+
+## D-10 Bootstrap comparison convention — Proposed
+Use seed 42 and 1,000 day-level bootstrap resamples. Report the 5th and 95th
+percentiles of model MAE minus A1 MAE, so negative values favour the model.
+Reason: SPEC §9 fixes neither the resample count nor the difference direction;
+this convention is deterministic and gives the requested 90% interval.

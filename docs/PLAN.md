@@ -10,7 +10,7 @@ DECISIONS.md before the next task starts.
 | T01 | Data audit                              | Decision | Done   |
 | T02 | Episodes, labels, panel                 | Plan     | Done   |
 | T03 | Exploratory analysis                    | -        | Done   |
-| T04 | Features, models A and B, backtest      | Plan     | Todo   |
+| T04 | Features, models A and B, backtest      | Plan     | Done   |
 | T05 | Forecast, evaluation report, README     | -        | Todo   |
 | T06 | Model C                                 | Plan     | Todo   |
 | T07 | Reproducibility check                   | -        | Todo   |

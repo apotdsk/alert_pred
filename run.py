@@ -8,10 +8,13 @@ from pathlib import Path
 
 import pandas as pd
 
-from alerts.config import (EPISODE_MERGE_TOLERANCE_SECONDS, PANEL_PATH, RAW_DATA_PATH,
-                           REFORM_DATES_PATH, UNIT_AREAS)
+from alerts.backtest import calculate_metrics, select_windows, walk_forward
+from alerts.config import (BACKTEST_PREDICTIONS_PATH, DAILY_METRICS_PATH,
+                           EPISODE_MERGE_TOLERANCE_SECONDS, METRICS_PATH, PANEL_PATH,
+                           RAW_DATA_PATH, REFORM_DATES_PATH, UNIT_AREAS)
 from alerts.data import acquire_sources, build_audit, clean_official, load_official
 from alerts.episodes import build_all_episodes, build_episodes, select_unit_records
+from alerts.features import build_features
 from alerts.labels import build_panel, compute_reform_dates, invariant_violations
 
 
@@ -46,6 +49,32 @@ def run_panel(raw_path: str | None = None) -> dict[str, object]:
           f"invariant violations: {violations}; complete: {summary['complete_share']:.1%}; "
           f"imputed among complete: {summary['complete_imputed_share']:.1%}")
     return summary
+
+
+def run_backtest(raw_path: str | None = None) -> dict[str, object]:
+    """Run the A1, A2, and B walk-forward backtest and save its metrics."""
+    source, _, panel, _ = _panel_data(raw_path)
+    reforms = compute_reform_dates(source)
+    validation_dates, test_dates = select_windows(panel)
+    reform_months = pd.to_datetime(reforms["reform_date"], errors="coerce").dropna()
+    if not reform_months.empty:
+        latest_safe_date = (reform_months + pd.DateOffset(months=3)).max().date()
+        if min(test_dates) < latest_safe_date:
+            raise AssertionError("test dates are not three months after every reform month")
+    features = build_features(panel, source, reforms)
+    predictions = walk_forward(features, test_dates)
+    metrics, daily_metrics = calculate_metrics(predictions)
+    BACKTEST_PREDICTIONS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    predictions.to_csv(BACKTEST_PREDICTIONS_PATH, index=False)
+    metrics.to_csv(METRICS_PATH, index=False)
+    daily_metrics.to_csv(DAILY_METRICS_PATH, index=False)
+    print(f"validation: {validation_dates[0]} through {validation_dates[-1]} (60 dates)")
+    print(f"test: {test_dates[0]} through {test_dates[-1]} (30 dates)")
+    print(f"backtest: {len(predictions)} predictions; {len(metrics)} metric rows; "
+          f"{len(daily_metrics)} daily metric rows")
+    return {"validation_dates": validation_dates, "test_dates": test_dates,
+            "predictions": len(predictions), "metrics": len(metrics),
+            "daily_metrics": len(daily_metrics)}
 
 
 def inspect_unit_day(unit: str, day: str, raw_path: str | None = None) -> None:
@@ -105,6 +134,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             print("audit")
         elif stage == "panel":
             run_panel(args.raw_path)
+        elif stage == "backtest":
+            if args.raw_path is None or isinstance(args.raw_path, (str, Path)):
+                run_backtest(args.raw_path)
+            else:
+                print(stage)
         else:
             print(stage)
     return 0

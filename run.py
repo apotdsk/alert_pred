@@ -4,11 +4,79 @@ from __future__ import annotations
 
 import argparse
 from collections.abc import Sequence
+from pathlib import Path
 
-from alerts.data import build_audit
+import pandas as pd
+
+from alerts.config import (EPISODE_MERGE_TOLERANCE_SECONDS, PANEL_PATH, RAW_DATA_PATH,
+                           REFORM_DATES_PATH, UNIT_AREAS)
+from alerts.data import acquire_sources, build_audit, clean_official, load_official
+from alerts.episodes import build_all_episodes, build_episodes, select_unit_records
+from alerts.labels import build_panel, compute_reform_dates, invariant_violations
 
 
 STAGES = ("audit", "panel", "backtest", "forecast", "report")
+
+
+def _panel_data(raw_path: str | None = None) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, set]:
+    official_path = acquire_sources(raw_path)[0] if raw_path is not None else RAW_DATA_PATH
+    source = clean_official(load_official(official_path))
+    snapshot = source["start"].max()
+    episodes = build_all_episodes(source, snapshot)
+    panel, gaps = build_panel(episodes, source, snapshot)
+    return source, episodes, panel, gaps
+
+
+def run_panel(raw_path: str | None = None) -> dict[str, object]:
+    """Build and save the label panel and accepted reform dates."""
+    source, _, panel, gaps = _panel_data(raw_path)
+    reforms = compute_reform_dates(source)
+    PANEL_PATH.parent.mkdir(parents=True, exist_ok=True)
+    panel.to_csv(PANEL_PATH, index=False)
+    reforms.to_csv(REFORM_DATES_PATH, index=False, date_format="%Y-%m-%d")
+    violations = invariant_violations(panel)
+    if violations:
+        raise AssertionError(f"label invariant violations: {violations}")
+    complete = panel["complete"]
+    complete_imputed = panel.loc[complete, "has_imputed_end"]
+    summary = {"unit_days": len(panel), "global_gap_dates": len(gaps),
+               "invariant_violations": violations, "complete_share": complete.mean(),
+               "complete_imputed_share": complete_imputed.mean()}
+    print(f"panel: {summary['unit_days']} unit-days; global zero-record dates: {summary['global_gap_dates']}; "
+          f"invariant violations: {violations}; complete: {summary['complete_share']:.1%}; "
+          f"imputed among complete: {summary['complete_imputed_share']:.1%}")
+    return summary
+
+
+def inspect_unit_day(unit: str, day: str, raw_path: str | None = None) -> None:
+    """Print source records, merged episodes, and labels for one unit-day."""
+    if unit not in UNIT_AREAS:
+        raise ValueError(f"unknown unit: {unit}")
+    if not PANEL_PATH.is_file():
+        raise FileNotFoundError(f"build the panel first: {PANEL_PATH}")
+    official_path = Path(raw_path) if raw_path is not None else RAW_DATA_PATH
+    source = clean_official(load_official(official_path))
+    panel = pd.read_csv(PANEL_PATH, parse_dates=["date"])
+    local_start = pd.Timestamp(day, tz="Europe/Kyiv").tz_convert("UTC")
+    local_end = (pd.Timestamp(day) + pd.DateOffset(days=1)).tz_localize("Europe/Kyiv").tz_convert("UTC")
+    unit_records = select_unit_records(source, unit)
+    tolerance = pd.Timedelta(seconds=EPISODE_MERGE_TOLERANCE_SECONDS)
+    episode_records = unit_records[
+        unit_records["start"].lt(local_end + tolerance)
+        & (unit_records["end"].isna() | unit_records["end"].gt(local_start - tolerance))]
+    episodes = build_episodes(episode_records, source["start"].max())
+    records = episode_records[
+        episode_records["start"].lt(local_end)
+        & (episode_records["end"].isna() | episode_records["end"].gt(local_start))]
+    selected_episodes = episodes[episodes["start"].lt(local_end) & episodes["end"].gt(local_start)]
+    selected_label = panel[(panel["unit"].eq(unit)) & panel["date"].eq(pd.Timestamp(day))]
+    print("records")
+    print(records[["oblast", "raion", "hromada", "level", "start", "end",
+                   "possible_imputed_end"]].to_string(index=False))
+    print("episodes")
+    print(selected_episodes.to_string(index=False))
+    print("labels")
+    print(selected_label.to_string(index=False))
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -27,7 +95,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.command == "inspect":
         if not args.unit or not args.date:
             build_parser().error("inspect requires <unit> <YYYY-MM-DD>")
-        print("inspect")
+        inspect_unit_day(args.unit, args.date, args.raw_path)
         return 0
 
     stages = (args.command,) if args.command else STAGES
@@ -35,6 +103,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         if stage == "audit":
             build_audit(args.raw_path)
             print("audit")
+        elif stage == "panel":
+            run_panel(args.raw_path)
         else:
             print(stage)
     return 0

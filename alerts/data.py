@@ -49,9 +49,19 @@ def load_official(path: str | Path) -> pd.DataFrame:
     out["start"] = pd.to_datetime(out["started_at"], utc=True, errors="coerce")
     out["end"] = pd.to_datetime(out["finished_at"], utc=True, errors="coerce")
     out["area"] = out["hromada"].combine_first(out["raion"]).combine_first(out["oblast"])
-    out["imputed_end"] = False  # This source has no imputation flag.
+    out["possible_imputed_end"] = (
+        (out["end"] - out["start"]).dt.total_seconds().eq(1800)
+    )
+    out["imputed_end"] = out["possible_imputed_end"]
     out["source_name"] = "official"
     return out
+
+
+def clean_official(frame: pd.DataFrame) -> pd.DataFrame:
+    """Apply the accepted duplicate and nonpositive-interval cleaning rules."""
+    cleaned = frame.drop_duplicates(["oblast", "raion", "hromada", "level", "start", "end"])
+    valid = cleaned["end"].isna() | cleaned["start"].isna() | cleaned["end"].gt(cleaned["start"])
+    return cleaned.loc[valid].copy()
 
 
 def load_volunteer(path: str | Path) -> pd.DataFrame:

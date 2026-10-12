@@ -49,11 +49,22 @@ def label_unit_day(episodes: pd.DataFrame, day: date | str, *, complete: bool = 
             "has_imputed_end": has_imputed}
 
 
-def global_gap_dates(frame: pd.DataFrame, first_day: date, last_day: date) -> set[date]:
-    """Return dates with no official records anywhere in the source."""
-    observed = set(frame["start"].dropna().dt.tz_convert(LOCAL_TIMEZONE).dt.date)
-    all_days = set(pd.date_range(first_day, last_day, freq="D").date)
-    return all_days - observed
+def source_gaps(frame: pd.DataFrame) -> pd.DataFrame:
+    """Return periods longer than 12 hours between consecutive source starts."""
+    starts = frame["start"].dropna().drop_duplicates().sort_values().reset_index(drop=True)
+    gaps = pd.DataFrame({"start": starts.shift(), "end": starts}).dropna()
+    gaps["hours"] = (gaps["end"] - gaps["start"]).dt.total_seconds() / 3600
+    return gaps.loc[gaps["hours"].gt(12)].reset_index(drop=True)
+
+
+def gap_dates(gaps: pd.DataFrame, first_day: date, last_day: date) -> set[date]:
+    """Return local dates whose day windows overlap a detected source gap."""
+    affected: set[date] = set()
+    for day in pd.date_range(first_day, last_day, freq="D").date:
+        day_start, day_end, _, _ = day_windows(day)
+        if ((gaps["start"] < day_end) & (gaps["end"] > day_start)).any():
+            affected.add(day)
+    return affected
 
 
 def _split_episodes_by_day(episodes: pd.DataFrame) -> pd.DataFrame:
@@ -95,13 +106,14 @@ def _split_episodes_by_day(episodes: pd.DataFrame) -> pd.DataFrame:
 
 
 def build_panel(episodes: pd.DataFrame, source: pd.DataFrame,
-                snapshot: pd.Timestamp) -> tuple[pd.DataFrame, set[date]]:
+                snapshot: pd.Timestamp) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Build the complete unit-date panel through the last covered local day."""
     first_local = source["start"].min().tz_convert(LOCAL_TIMEZONE)
     first_day = (first_local.normalize() + pd.DateOffset(days=1)).date()
     snapshot_local = snapshot.tz_convert(LOCAL_TIMEZONE)
     last_day = (snapshot_local.normalize() - pd.DateOffset(days=1)).date()
-    gaps = global_gap_dates(source, first_day, last_day)
+    gaps = source_gaps(source) if source["oblast"].nunique() > 1 else source_gaps(source).iloc[0:0]
+    incomplete_gap_dates = gap_dates(gaps, first_day, last_day)
     pieces = _split_episodes_by_day(episodes)
     grouped = pieces.groupby(["unit", "date"], sort=False).agg(
         alert_count=("episode_count", "sum"),
@@ -117,7 +129,7 @@ def build_panel(episodes: pd.DataFrame, source: pd.DataFrame,
     panel[numeric] = panel[numeric].fillna(0.0)
     panel[["has_imputed_end", "has_open_end"]] = panel[
         ["has_imputed_end", "has_open_end"]].fillna(False).astype(bool)
-    panel["complete"] = ~panel["date"].isin(gaps) & ~panel["has_open_end"]
+    panel["complete"] = ~panel["date"].isin(incomplete_gap_dates) & ~panel["has_open_end"]
     occupied_kherson = panel["unit"].eq("Kherson") & (
         pd.to_datetime(panel["date"]) < pd.Timestamp(KHERSON_LIBERATION_DATE))
     panel.loc[occupied_kherson, "complete"] = False

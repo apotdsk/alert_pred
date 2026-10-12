@@ -11,8 +11,9 @@ import pandas as pd
 from alerts.backtest import clip_predictions
 from alerts.config import (BACKTEST_PREDICTIONS_PATH, DAILY_METRICS_PATH,
                            EVALUATION_PATH, FIGURES_DIR, METRICS_PATH,
-                           SOURCE_GAP_DESCRIPTION, SOURCE_URL, UNIT_AREAS)
+                           SOURCE_URL, UNIT_AREAS)
 from alerts.features import TARGETS, build_features
+from alerts.labels import source_gaps
 from alerts.models import add_unit_codes, baseline_predictions, pooled_predictions
 
 
@@ -70,10 +71,10 @@ def _save_charts(predictions: pd.DataFrame, daily: pd.DataFrame) -> list[Path]:
     fig, axes = plt.subplots(3, 1, figsize=(11, 12))
     for ax, target in zip(axes, TARGETS):
         part = predictions[predictions["target"].eq(target)]
-        actual = part.groupby("date")["actual"].mean()
+        actual = part.groupby("date")["actual"].mean().asfreq("D")
         ax.plot(pd.to_datetime(actual.index), actual, label="Observed", color="black")
         for model in ("A1", "B"):
-            values = part[part["model"].eq(model)].groupby("date")["prediction"].mean()
+            values = part[part["model"].eq(model)].groupby("date")["prediction"].mean().asfreq("D")
             ax.plot(pd.to_datetime(values.index), values, label=model)
         ax.set(title=target.replace("_", " "), xlabel="Date", ylabel="Daily mean")
         ax.legend()
@@ -100,7 +101,8 @@ def _save_charts(predictions: pd.DataFrame, daily: pd.DataFrame) -> list[Path]:
     for ax, target in zip(axes, TARGETS):
         part = overall[overall["target"].eq(target)]
         for model, values in part.groupby("model"):
-            ax.plot(pd.to_datetime(values["date"]), values["mae"], label=model)
+            series = values.set_index("date")["mae"].sort_index().asfreq("D")
+            ax.plot(series.index, series, label=model)
         ax.set(title=target.replace("_", " "), xlabel="Date", ylabel="MAE")
         ax.legend()
     fig.tight_layout()
@@ -118,8 +120,15 @@ def _metrics_table(metrics: pd.DataFrame) -> str:
     rule = "| " + " | ".join("---" for _ in columns) + " |"
     rows = []
     for values in selected[columns].itertuples(index=False, name=None):
-        shown = [format(value, ".17g") if isinstance(value, float) else str(value)
-                 for value in values]
+        target = values[1]
+        decimals = 3 if target == "alert_count" else 1
+        shown = []
+        for column, value in zip(columns, values):
+            if isinstance(value, float):
+                precision = 3 if column == "share_days_lower_than_a1" else decimals
+                shown.append(f"{value:.{precision}f}")
+            else:
+                shown.append(str(value))
         rows.append("| " + " | ".join(shown) + " |")
     return "\n".join([header, rule, *rows])
 
@@ -133,6 +142,11 @@ def build_evaluation(records: pd.DataFrame) -> Path:
     test_dates = sorted(predictions["date"].dt.date.unique())
     validation_end = pd.Timestamp(test_dates[0]) - pd.Timedelta(days=1)
     validation_start = validation_end - pd.Timedelta(days=59)
+    gaps = source_gaps(records)
+    gap_lines = "\n".join(
+        f"- Source gap: `{gap.start.isoformat()}` to `{gap.end.isoformat()}` "
+        f"({gap.hours:.2f} hours); all overlapping local dates are excluded."
+        for gap in gaps.itertuples(index=False))
     verdicts = []
     candidates = metrics[metrics["group_type"].isin(["overall", "reporting_group"])
                          & ~metrics["model"].eq("A1")]
@@ -149,7 +163,7 @@ def build_evaluation(records: pd.DataFrame) -> Path:
 
 - Source: [{SOURCE_URL}]({SOURCE_URL})
 - Data snapshot (last event timestamp): `{records['start'].max().isoformat()}`
-- The source gap {SOURCE_GAP_DESCRIPTION} is excluded because those dates are not complete for every unit.
+{gap_lines}
 - Validation: {validation_start.date()} through {validation_end.date()} (60 dates)
 - Test: {test_dates[0]} through {test_dates[-1]} (30 complete dates)
 

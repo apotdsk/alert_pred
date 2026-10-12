@@ -22,7 +22,7 @@ from alerts.report import build_evaluation, build_forecast
 STAGES = ("audit", "panel", "backtest", "forecast", "report")
 
 
-def _panel_data(raw_path: str | None = None) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, set]:
+def _panel_data(raw_path: str | None = None) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     official_path = acquire_sources(raw_path)[0] if raw_path is not None else RAW_DATA_PATH
     source = clean_official(load_official(official_path))
     snapshot = source["start"].max()
@@ -43,12 +43,14 @@ def run_panel(raw_path: str | None = None) -> dict[str, object]:
         raise AssertionError(f"label invariant violations: {violations}")
     complete = panel["complete"]
     complete_imputed = panel.loc[complete, "has_imputed_end"]
-    summary = {"unit_days": len(panel), "global_gap_dates": len(gaps),
+    summary = {"unit_days": len(panel), "source_gaps": len(gaps),
                "invariant_violations": violations, "complete_share": complete.mean(),
                "complete_imputed_share": complete_imputed.mean()}
-    print(f"panel: {summary['unit_days']} unit-days; global zero-record dates: {summary['global_gap_dates']}; "
+    print(f"panel: {summary['unit_days']} unit-days; source gaps: {summary['source_gaps']}; "
           f"invariant violations: {violations}; complete: {summary['complete_share']:.1%}; "
           f"imputed among complete: {summary['complete_imputed_share']:.1%}")
+    for gap in gaps.itertuples(index=False):
+        print(f"source gap: {gap.start.isoformat()} to {gap.end.isoformat()} ({gap.hours:.2f} hours)")
     return summary
 
 

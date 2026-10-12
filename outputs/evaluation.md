@@ -4,9 +4,21 @@
 
 - Source: [https://raw.githubusercontent.com/Vadimkin/ukrainian-air-raid-sirens-dataset/master/datasets/official_data_en.csv](https://raw.githubusercontent.com/Vadimkin/ukrainian-air-raid-sirens-dataset/master/datasets/official_data_en.csv)
 - Data snapshot (last event timestamp): `2026-09-07T05:28:22+00:00`
-- The source gap 2026-08-30 through 2026-09-01 is excluded because those dates are not complete for every unit.
-- Validation: 2026-06-06 through 2026-08-04 (60 dates)
-- Test: 2026-08-05 through 2026-09-06 (30 complete dates)
+- Source gap: `2022-10-29T22:56:11+00:00` to `2022-10-30T13:10:34+00:00` (14.24 hours); all overlapping local dates are excluded.
+- Source gap: `2022-11-20T07:18:31+00:00` to `2022-11-20T19:37:38+00:00` (12.32 hours); all overlapping local dates are excluded.
+- Source gap: `2022-11-25T20:12:36+00:00` to `2022-11-26T09:36:31+00:00` (13.40 hours); all overlapping local dates are excluded.
+- Source gap: `2022-11-27T22:16:09+00:00` to `2022-11-28T11:54:56+00:00` (13.65 hours); all overlapping local dates are excluded.
+- Source gap: `2022-12-25T16:01:01+00:00` to `2022-12-26T09:02:28+00:00` (17.02 hours); all overlapping local dates are excluded.
+- Source gap: `2023-01-02T20:28:54+00:00` to `2023-01-03T10:27:27+00:00` (13.98 hours); all overlapping local dates are excluded.
+- Source gap: `2023-01-12T19:42:10+00:00` to `2023-01-13T08:21:05+00:00` (12.65 hours); all overlapping local dates are excluded.
+- Source gap: `2023-01-14T16:36:44+00:00` to `2023-01-15T06:39:59+00:00` (14.05 hours); all overlapping local dates are excluded.
+- Source gap: `2023-01-17T06:02:26+00:00` to `2023-01-17T19:13:39+00:00` (13.19 hours); all overlapping local dates are excluded.
+- Source gap: `2023-01-17T19:13:39+00:00` to `2023-01-18T11:52:01+00:00` (16.64 hours); all overlapping local dates are excluded.
+- Source gap: `2023-03-18T17:46:22+00:00` to `2023-03-19T07:25:28+00:00` (13.65 hours); all overlapping local dates are excluded.
+- Source gap: `2025-04-19T18:52:32+00:00` to `2025-04-20T13:56:24+00:00` (19.06 hours); all overlapping local dates are excluded.
+- Source gap: `2026-08-29T04:55:28+00:00` to `2026-09-02T13:48:04+00:00` (104.88 hours); all overlapping local dates are excluded.
+- Validation: 2026-06-04 through 2026-08-02 (60 dates)
+- Test: 2026-08-03 through 2026-09-06 (30 complete dates)
 
 ## Metrics
 
@@ -15,33 +27,33 @@ for MAE difference versus A1 are shown below. Negative differences favor the mod
 
 | group | target | model | mae | share_days_lower_than_a1 | mae_difference_vs_a1_ci90_low | mae_difference_vs_a1_ci90_high |
 | --- | --- | --- | --- | --- | --- | --- |
-| overall | alert_count | A1 | 1.5320910973084885 | 0 | 0 | 0 |
-| overall | alert_count | A2 | 1.5391304347826087 | 0.56666666666666665 | -0.045962732919254602 | 0.0567287784679089 |
-| overall | alert_count | B | 1.4169008942154635 | 0.6333333333333333 | -0.18131703965841131 | -0.038439892034030698 |
-| overall | alert_duration_minutes | A1 | 94.945531400966203 | 0 | 0 | 0 |
-| overall | alert_duration_minutes | A2 | 96.981207729468593 | 0.40000000000000002 | -2.3652946859903401 | 5.9678136645962727 |
-| overall | alert_duration_minutes | B | 92.6827007727113 | 0.56666666666666665 | -9.6044782881913395 | 4.1320563860743125 |
-| overall | business_hours_duration_minutes | A1 | 70.783316080055201 | 0 | 0 | 0 |
-| overall | business_hours_duration_minutes | A2 | 71.389396135265699 | 0.46666666666666667 | -2.5283540372670772 | 3.4919777432712218 |
-| overall | business_hours_duration_minutes | B | 67.728671656183664 | 0.53333333333333333 | -6.4162681910289612 | 0.52815614243150999 |
-| frontline | alert_count | A1 | 1.926190476190476 | 0 | 0 | 0 |
-| frontline | alert_count | A2 | 2.0333333333333332 | 0.40000000000000002 | -0.0035714285714285002 | 0.22380952380952371 |
-| frontline | alert_count | B | 1.8935930817839248 | 0.53333333333333333 | -0.1374017499072889 | 0.0723313289279746 |
-| frontline | alert_duration_minutes | A1 | 95.214047619047605 | 0 | 0 | 0 |
-| frontline | alert_duration_minutes | A2 | 98.925416666666678 | 0.36666666666666659 | -0.52263194444442029 | 7.4667777777778008 |
-| frontline | alert_duration_minutes | B | 105.06997942688513 | 0.36666666666666659 | 3.6734124503204 | 16.420952293679296 |
-| frontline | business_hours_duration_minutes | A1 | 81.464365079365081 | 0 | 0 | 0 |
-| frontline | business_hours_duration_minutes | A2 | 84.431944444444468 | 0.36666666666666659 | -1.7285535714285798 | 7.6190019841269923 |
-| frontline | business_hours_duration_minutes | B | 86.696079498753534 | 0.33333333333333331 | -0.039273324606863003 | 10.060269284090571 |
-| other | alert_count | A1 | 1.4491228070175437 | 0 | 0 | 0 |
-| other | alert_count | A2 | 1.4350877192982461 | 0.53333333333333333 | -0.072932330827067696 | 0.039373433583959797 |
-| other | alert_count | B | 1.3165446442010498 | 0.66666666666666663 | -0.21578071313605771 | -0.057660639816433698 |
-| other | alert_duration_minutes | A1 | 94.889001670843783 | 0 | 0 | 0 |
-| other | alert_duration_minutes | A2 | 96.571900584795316 | 0.43333333333333329 | -3.3410833333333367 | 7.169064745196323 |
-| other | alert_duration_minutes | B | 90.074852634990506 | 0.56666666666666665 | -12.801464016990156 | 2.9511803013599569 |
-| other | business_hours_duration_minutes | A1 | 68.534674185463658 | 0 | 0 | 0 |
-| other | business_hours_duration_minutes | A2 | 68.643596491228067 | 0.53333333333333333 | -3.5182299498746845 | 3.749223475355056 |
-| other | business_hours_duration_minutes | B | 63.735533163011041 | 0.56666666666666665 | -9.1509666055992405 | -0.3552162055995508 |
+| overall | alert_count | A1 | 1.448 | 0.000 | 0.000 | 0.000 |
+| overall | alert_count | A2 | 1.451 | 0.533 | -0.037 | 0.042 |
+| overall | alert_count | B | 1.386 | 0.700 | -0.113 | -0.003 |
+| overall | alert_duration_minutes | A1 | 88.9 | 0.000 | 0.0 | 0.0 |
+| overall | alert_duration_minutes | A2 | 90.0 | 0.433 | -3.7 | 5.3 |
+| overall | alert_duration_minutes | B | 87.6 | 0.533 | -7.8 | 5.0 |
+| overall | business_hours_duration_minutes | A1 | 66.6 | 0.000 | 0.0 | 0.0 |
+| overall | business_hours_duration_minutes | A2 | 66.3 | 0.500 | -3.4 | 2.6 |
+| overall | business_hours_duration_minutes | B | 64.5 | 0.533 | -5.6 | 1.2 |
+| frontline | alert_count | A1 | 1.764 | 0.000 | 0.000 | 0.000 |
+| frontline | alert_count | A2 | 1.800 | 0.533 | -0.060 | 0.150 |
+| frontline | alert_count | B | 1.809 | 0.500 | -0.043 | 0.139 |
+| frontline | alert_duration_minutes | A1 | 90.1 | 0.000 | 0.0 | 0.0 |
+| frontline | alert_duration_minutes | A2 | 93.9 | 0.400 | -0.9 | 7.7 |
+| frontline | alert_duration_minutes | B | 101.1 | 0.300 | 4.7 | 16.7 |
+| frontline | business_hours_duration_minutes | A1 | 77.9 | 0.000 | 0.0 | 0.0 |
+| frontline | business_hours_duration_minutes | A2 | 81.4 | 0.367 | -1.0 | 8.4 |
+| frontline | business_hours_duration_minutes | B | 83.4 | 0.333 | 0.7 | 10.2 |
+| other | alert_count | A1 | 1.381 | 0.000 | 0.000 | 0.000 |
+| other | alert_count | A2 | 1.377 | 0.433 | -0.051 | 0.043 |
+| other | alert_count | B | 1.297 | 0.733 | -0.143 | -0.026 |
+| other | alert_duration_minutes | A1 | 88.7 | 0.000 | 0.0 | 0.0 |
+| other | alert_duration_minutes | A2 | 89.2 | 0.533 | -4.5 | 5.6 |
+| other | alert_duration_minutes | B | 84.8 | 0.567 | -11.6 | 3.9 |
+| other | business_hours_duration_minutes | A1 | 64.3 | 0.000 | 0.0 | 0.0 |
+| other | business_hours_duration_minutes | A2 | 63.2 | 0.567 | -4.3 | 2.2 |
+| other | business_hours_duration_minutes | B | 60.5 | 0.567 | -7.9 | 0.1 |
 
 ## Charts
 
@@ -57,8 +69,8 @@ Verdicts are stated only when the 90% interval excludes zero.
 
 - overall, alert_count, B: better than A1.
 - frontline, alert_duration_minutes, B: worse than A1.
+- frontline, business_hours_duration_minutes, B: worse than A1.
 - other, alert_count, B: better than A1.
-- other, business_hours_duration_minutes, B: better than A1.
 
 ## Limitations
 

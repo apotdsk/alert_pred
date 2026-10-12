@@ -3,7 +3,7 @@
 import pandas as pd
 
 from alerts.episodes import build_episodes, select_unit_records
-from alerts.labels import day_windows, label_unit_day
+from alerts.labels import build_panel, day_windows, label_unit_day, source_gaps
 
 
 def _records(rows):
@@ -67,3 +67,22 @@ def test_coverage_gap_is_nan():
     assert not label["complete"]
     assert pd.isna(label["alert_count"])
     assert pd.isna(label["alert_duration_minutes"])
+
+
+def test_source_gap_period_makes_every_overlapping_day_incomplete():
+    source = _records([
+        {"oblast": "Cherkaska oblast", "start": "2024-01-01 04:00Z",
+         "end": "2024-01-01 04:30Z"},
+        {"oblast": "Vinnytska oblast", "start": "2024-01-03 13:00Z",
+         "end": "2024-01-03 13:30Z"},
+        {"oblast": "Cherkaska oblast", "start": "2024-01-03 23:00Z",
+         "end": "2024-01-03 23:30Z"},
+    ])
+    episodes = build_episodes(source)
+    gaps = source_gaps(source)
+    panel, _ = build_panel(episodes.assign(unit="Cherkasy"), source,
+                           pd.Timestamp("2024-01-05 00:00Z"))
+    cher = panel[panel["unit"].eq("Cherkasy")].set_index("date")
+    assert len(gaps) == 1
+    assert not cher.loc[pd.Timestamp("2024-01-01").date():
+                        pd.Timestamp("2024-01-03").date(), "complete"].any()

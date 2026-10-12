@@ -68,3 +68,7 @@ in the official data. Every unit-day overlapping a gap is incomplete. Replaces t
 zero-record-date rule from T02. Evidence: records stop around 2026-08-29 05:30 UTC
 and resume around 2026-09-02 15:00 UTC; the border days were partly observed but
 counted as complete, with mean counts of about 1.4 and 1.8 against a typical 3-5.
+Known limitation: the 12-hour rule also excludes 2025-04-19/20, which coincides with
+the declared Easter truce and is plausibly a genuinely quiet period, and two
+ambiguous overnight periods in 2023. Effect: a few training days; the test window
+is unaffected.

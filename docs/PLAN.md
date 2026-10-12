@@ -12,6 +12,7 @@ DECISIONS.md before the next task starts.
 | T03 | Exploratory analysis                    | -        | Done   |
 | T04 | Features, models A and B, backtest      | Plan     | Done   |
 | T05 | Forecast, evaluation report, README     | -        | Done   |
+| T05b| Source gaps as time periods             | -        | Done   |
 | T06 | Model C                                 | Plan     | Todo   |
 | T07 | Reproducibility check                   | -        | Todo   |
 

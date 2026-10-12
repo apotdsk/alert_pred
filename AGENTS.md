@@ -79,5 +79,6 @@ Open issues: <or "none">
 
 - `docs/PLAN.md`: change only this task's status. `Done` only if the owner wrote "Approved".
 - `docs/HANDOFF.md`: overwrite, keeping its headings.
-- `docs/DECISIONS.md`: append choices you made as `D-XX ... — Proposed`.
+- `docs/DECISIONS.md`: append only new choices made in this task, as
+  `D-XX ... — Proposed`. Never restate, renumber or contradict an existing entry.
 - Show the diff of `docs/` and stop.

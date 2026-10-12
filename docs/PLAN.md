@@ -47,11 +47,25 @@ findings, each tied to a chart.
 Done when: Restart and Run All succeeds; 5 charts saved to `outputs/figures/`.
 
 ## T04 Features, models A and B, backtest
-Scope: `features.py` (SPEC §7); `models.py` with A1, A2, B (SPEC §8); `backtest.py`
-(SPEC §9); `tests/test_leakage.py`.
-Done when: `outputs/backtest_predictions.csv` and `outputs/metrics.csv` exist for the
-test window; the `train.date.max() < D` assert runs every iteration; the leakage test
-passes; test and validation dates are printed.
+Scope: apply D-08 in `labels.py` (Kherson incomplete before 2022-11-11) and regenerate
+the panel; `features.py` with cutoff-safe features (SPEC §7–8, `post_reform` from D-05,
+0 for units without a reform date); `models.py` with A1, A2 and B (SPEC §8, library
+defaults plus `loss="absolute_error"`, no hyperparameter search); `backtest.py` with
+the walk-forward loop and metrics (SPEC §9), grouped per D-09; `tests/test_leakage.py`
+(SPEC §11).
+Out of scope: model C (T06); forecast CSV, evaluation report and charts (T05).
+Done when:
+- test window (30 dates) and validation window (60 dates before it) are printed; the
+  test window ends at the last complete date;
+- the `train.date.max() < D` assert runs every iteration; the leakage test passes;
+  all earlier tests pass unchanged;
+- `outputs/backtest_predictions.csv`: one row per unit, test date, target and model;
+- `outputs/metrics.csv`: MAE per target and model for overall, frontline, other
+  (D-09) and each unit; versus A1, the share of test days with lower MAE and a 90%
+  day-level bootstrap interval of the MAE difference;
+- `outputs/daily_metrics.csv`: MAE per test date, target and model;
+- Kherson has no complete unit-day before 2022-11-11; invariant violations stay 0;
+- `python run.py` finishes in under 5 minutes.
 
 ## T05 Forecast, evaluation report, README
 Scope: `report.py`: forecast CSV for the next local date from the latest snapshot

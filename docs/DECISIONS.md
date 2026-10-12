@@ -35,43 +35,23 @@ Computed from the official data and saved to `data/processed/reform_dates.csv`.
 The "first detailed date" table in the T01 audit is not used: one early detailed
 record does not mean reporting changed.
 
-## D-06 Minimum dependency versions — Proposed
-Use pandas 2.0, NumPy 1.24, matplotlib 3.7, scikit-learn 1.3 and pytest 7.4 as the
-minimum supported versions. Reason: these versions support Python 3.11 and the APIs
-required by the specification while avoiding unnecessary upper bounds.
+## D-06 Minimum dependency versions — Accepted
+pandas 2.0, NumPy 1.24, matplotlib 3.7, scikit-learn 1.3, pytest 7.4 as minimum
+versions; no upper bounds.
 
-## D-07 Primary source and imputed ends — Proposed
-Use `official_data_en.csv` as the primary source and keep `volunteer_data_en.csv` only
-as a separately audited comparison candidate; never merge them. The volunteer source
-starts earlier and has an explicit `naive` flag, but it is oblast-only and cannot supply
-the capital-level coverage required by SPEC §2. Flag volunteer ends only when
-`naive=True`; do not infer official imputation from an exact 30-minute duration because
-the official file supplies no imputation flag. Evidence: `outputs/data_audit.md` reports
-per-unit daily-minute correlation and mean absolute difference for complete overlapping
-months 2022-04 through 2026-08.
+## D-07 Exploratory summary population — Accepted
+Complete unit-days only. The all-unit daily value is the mean across complete units
+on that date; annual values are the mean of those daily means. The frontline
+comparison uses each unit's final 28-day rolling mean versus the median of the other
+units. The reform comparison uses the all-unit mean in the 60 days before and after
+the median D-05 reform date.
 
-## D-08 Episode merge tolerance — Proposed
-Use 60 seconds. Both audited candidates have second-level timestamps; a 60-second
-tolerance absorbs only a sub-minute reporting gap and retains the operational meaning
-of a longer all-clear.
+## D-08 Kherson occupation period — Accepted
+Kherson unit-days before 2022-11-11 (liberation of Kherson city) are incomplete:
+zero alerts there reflect occupation, not quiet days. Labels NaN, excluded from
+training and evaluation.
 
-## D-09 Reporting reform dates — Proposed
-Use these first observed dates on which the configured capital is covered by a raion-
-or hromada-level official record: Cherkasy 2022-03-16; Chernihiv 2022-03-22;
-Chernivtsi 2022-06-07; Dnipro 2022-03-16; Donetsk/Kramatorsk 2022-03-15;
-Ivano-Frankivsk 2025-11-06; Kharkiv 2022-03-16; Kherson 2022-03-28;
-Khmelnytskyi 2022-03-15; Kropyvnytskyi 2022-03-16; Kyiv not observed; Lutsk
-2025-11-06; Lviv 2025-09-03; Mykolaiv 2022-03-16; Odesa 2022-03-16; Poltava
-2022-03-16; Rivne 2022-03-20; Sumy 2022-03-15; Ternopil 2025-11-06; Uzhhorod
-2025-11-06; Vinnytsia 2022-06-09; Zaporizhzhia 2022-03-16; Zhytomyr 2022-03-15.
-Reason: these dates use the accepted capital covering rule; the volunteer source is
-oblast-only and provides no reform evidence.
-
-## D-10 Exploratory summary population — Proposed
-Use complete unit-days only for exploratory summaries. Define the all-unit daily value
-as the mean across complete units on that date and annual values as the mean of those
-daily means. Define the endpoint comparison from each unit's final 28-day rolling mean;
-compare the four named frontline units with the median of all other units. Compare the
-all-unit mean for the 60 calendar days before and after the median non-missing D-05
-reform date. Reason: these definitions keep missing coverage out of descriptive values,
-weight dates equally, and make the reported trend and reform comparison reproducible.
+## D-09 Reporting groups — Accepted
+Metrics are reported overall and separately for the frontline group (Donetsk,
+Kharkiv, Sumy, Zaporizhzhia) and the other 19 units. Reason: the frontline units
+approach the 1440-minute ceiling and would otherwise dominate pooled MAE.

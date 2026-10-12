@@ -4,10 +4,15 @@ Settled choices; they override SPEC defaults. Codex appends new entries with sta
 Proposed; the owner sets Accepted or Rejected.
 Format: `## D-XX Title — Status`, then the decision, the reason, the evidence.
 
-## D-01 Source file and imputed end times — Open (settle after T01)
-Default: `datasets/official_data_en.csv` from the Vadimkin
-ukrainian-air-raid-sirens-dataset on GitHub (MIT licence). Records with imputed ends are
-kept and flagged; metrics are reported with and without flagged unit-days.
+## D-01 Source and imputed end times — Accepted
+Official dataset `official_data_en.csv`, snapshot ending 2026-09-07 05:28 UTC; the
+upstream file has not been updated since. The volunteer dataset is oblast-level only,
+so it cannot support the capital rule; it is not used in the pipeline. The report
+states the snapshot date as the effective cutoff. Before building episodes: drop
+exact duplicate rows and rows with end <= start. Official rows lasting exactly
+1800 s are flagged `possible_imputed_end` (the repository documents 30-minute
+imputation for missing ends); they are kept, and the share of flagged unit-days
+is reported.
 
 ## D-02 Units and capital mapping — Accepted
 23 units. Each oblast's administrative centre, its raion and its hromada, as listed in
@@ -15,18 +20,20 @@ kept and flagged; metrics are reported with and without flagged unit-days.
 oblast share one unit, "Kyiv", built from Kyiv City records. Reason: closest to where
 businesses operate; Kyiv oblast businesses get the city forecast as an approximation.
 
-## D-03 Episode merge tolerance — Open (settle after T01)
-Default: 60 s, assuming minute timestamp precision (confirm in the audit). Shorter gaps
-are not an all-clear a business could act on.
+## D-03 Episode merge tolerance — Accepted
+60 s. Timestamps have second precision.
 
 ## D-04 Luhansk oblast — Accepted
 Excluded from training, evaluation and forecasts. Reason: near-permanent alert makes the
 forecast trivial and distorts pooled models and metrics. The audit confirms the status.
 
-## D-05 Reporting reform dates — Open (settle after T01)
-Per unit, the first date its capital is covered by raion- or hromada-level records
-instead of oblast-level only. The audit's table is copied here. These are changes in
-alert reporting, not in attack tactics; tactics are model C2's subject.
+## D-05 Reporting reform dates — Accepted
+A unit's reform date is the first month from which raion- or hromada-level records
+make up more than half of the records covering its capital, for at least 3
+consecutive months. Units that never meet this (e.g. Kyiv) have no reform date.
+Computed from the official data and saved to `data/processed/reform_dates.csv`.
+The "first detailed date" table in the T01 audit is not used: one early detailed
+record does not mean reporting changed.
 
 ## D-06 Minimum dependency versions — Proposed
 Use pandas 2.0, NumPy 1.24, matplotlib 3.7, scikit-learn 1.3 and pytest 7.4 as the

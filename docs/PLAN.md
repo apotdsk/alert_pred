@@ -27,7 +27,7 @@ runs without collection errors.
 Scope: `data.py` downloads the source to `data/raw/` if missing (or uses `--raw-path`),
 parses timestamps, normalizes region names; `python run.py audit` writes
 `outputs/data_audit.md` and its figures as SPEC §5, ending with proposed wording for
-D-01 to D-05.
+D-01 to D-05. Apply D-01 cleaning (duplicates, end <= start, possible_imputed_end flag) and compute D-05 reform dates into data/processed/reform_dates.csv.
 Out of scope: episodes, labels, models.
 Done when: every item of SPEC §5 appears in the audit; `python run.py audit` exits 0.
 

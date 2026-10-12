@@ -56,8 +56,8 @@ Metrics are reported overall and separately for the frontline group (Donetsk,
 Kharkiv, Sumy, Zaporizhzhia) and the other 19 units. Reason: the frontline units
 approach the 1440-minute ceiling and would otherwise dominate pooled MAE.
 
-## D-10 Bootstrap comparison convention — Proposed
-Use seed 42 and 1,000 day-level bootstrap resamples. Report the 5th and 95th
-percentiles of model MAE minus A1 MAE, so negative values favour the model.
-Reason: SPEC §9 fixes neither the resample count nor the difference direction;
-this convention is deterministic and gives the requested 90% interval.
+## D-10 Live forecast — Accepted
+D = the first date after the last complete date; cutoff C(D) = 00:00 Europe/Kyiv on D.
+Built exactly like a backtest prediction (models refit on all complete dates < D);
+records after C(D) are ignored. One row per unit and model (A1, A2, B). Reason: this
+is the validated procedure; the partial day after the snapshot is not used.

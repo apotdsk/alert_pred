@@ -68,13 +68,24 @@ Done when:
 - `python run.py` finishes in under 5 minutes.
 
 ## T05 Forecast, evaluation report, README
-Scope: `report.py`: forecast CSV for the next local date from the latest snapshot
-(SPEC §10); `outputs/evaluation.md` with date ranges, snapshot time, metrics table,
-per-day spread, bootstrap intervals and 3 charts (predicted vs observed, MAE by unit,
-per-day MAE); README with setup, run command, Jupyter usage, data definitions,
-limitations and the disclaimer.
-Done when: the forecast has 25 rows or documented exclusions; README commands work in
-a new terminal.
+Scope: `report.py`:
+- forecast per D-10 to `outputs/forecast_<date>.csv` (SPEC §10 columns; data_snapshot
+  = last event timestamp);
+- `outputs/evaluation.md`: source and snapshot; the 2026-08-30..09-01 source gap and
+  its exclusion; validation and test ranges; per target and model for overall,
+  frontline and other (D-09): MAE, share of days better than A1, 90% bootstrap
+  interval; 3 charts: all-unit daily mean predicted (A1, B) vs observed per target,
+  MAE by unit, per-day MAE; verdicts only where the interval excludes 0;
+  limitations: data end, single autumn-2025 reform period, Kyiv approximation,
+  Luhansk/Crimea excluded, Kherson occupation, imputed ends;
+- `README.md`: purpose and advisory disclaimer; setup on Python 3.12 venv; install;
+  `python run.py`; Jupyter (kernel registration, notebook path); data definitions
+  (units, covering rule, three labels, windows); outputs; link to evaluation.md;
+- `requirements.txt`: add `ipykernel` and `notebook`.
+Out of scope: model C (T06).
+Done when: forecast has 69 rows (23 units x 3 models) within bounds; every number
+in evaluation.md matches metrics.csv; README commands work in a new terminal;
+`python run.py` finishes in under 5 minutes.
 
 ## T06 Model C
 Scope: C1 and C2 as SPEC §8 in `models.py` and `backtest.py`; a model C section in

@@ -27,3 +27,8 @@ forecast trivial and distorts pooled models and metrics. The audit confirms the 
 Per unit, the first date its capital is covered by raion- or hromada-level records
 instead of oblast-level only. The audit's table is copied here. These are changes in
 alert reporting, not in attack tactics; tactics are model C2's subject.
+
+## D-06 Minimum dependency versions — Proposed
+Use pandas 2.0, NumPy 1.24, matplotlib 3.7, scikit-learn 1.3 and pytest 7.4 as the
+minimum supported versions. Reason: these versions support Python 3.11 and the APIs
+required by the specification while avoiding unnecessary upper bounds.

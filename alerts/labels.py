@@ -1,0 +1,1 @@
+"""Daily label construction stubs."""

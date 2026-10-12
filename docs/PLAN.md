@@ -6,7 +6,7 @@ DECISIONS.md before the next task starts.
 
 | ID  | Task                                    | Gate     | Status |
 |-----|-----------------------------------------|----------|--------|
-| T00 | Scaffold                                | -        | Todo   |
+| T00 | Scaffold                                | -        | Done   |
 | T01 | Data audit                              | Decision | Todo   |
 | T02 | Episodes, labels, panel                 | Plan     | Todo   |
 | T03 | Exploratory analysis                    | -        | Todo   |

@@ -1,20 +1,22 @@
 # HANDOFF
 
 ## Updated
-<YYYY-MM-DD>, before T00
+2026-10-12, after T00
 
 ## Project start
-<YYYY-MM-DD>
+2026-10-12
 
 ## Current state
-Repository holds AGENTS.md, .gitignore and docs/ (SPEC, PLAN, DECISIONS, HANDOFF,
-prompts). No code yet.
+T00 is approved and complete. The repository now has the `alerts/` package and its
+required module stubs, a CLI scaffold in `run.py`, minimum dependencies, a README
+skeleton with the advisory disclaimer, and placeholder project directories. The
+required pytest and full-run checks pass.
 
 ## Data snapshot
 None yet.
 
 ## Next step
-T00 Scaffold.
+T01 Data audit (Decision gate).
 
 ## Known issues
 None.

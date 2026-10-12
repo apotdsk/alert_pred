@@ -27,16 +27,17 @@ runs without collection errors.
 Scope: `data.py` downloads the source to `data/raw/` if missing (or uses `--raw-path`),
 parses timestamps, normalizes region names; `python run.py audit` writes
 `outputs/data_audit.md` and its figures as SPEC §5, ending with proposed wording for
-D-01 to D-05. Apply D-01 cleaning (duplicates, end <= start, possible_imputed_end flag) and compute D-05 reform dates into data/processed/reform_dates.csv.
+D-01 to D-05. 
 Out of scope: episodes, labels, models.
-Done when: every item of SPEC §5 appears in the audit; `python run.py audit` exits 0.
+Done when: every item of SPEC §5 appears in the audit; `python run.py audit` exits 0. 
 
 ## T02 Episodes, labels, panel
 Scope: `episodes.py` (covering rule SPEC §2, merge tolerance SPEC §4); `labels.py`
 (windows SPEC §3, labels SPEC §4, coverage SPEC §6); `data/processed/panel.csv`; the
 `inspect` command; the invariant check in `run.py`; `tests/test_labels.py` (SPEC §11).
+Apply D-01 cleaning (duplicates, end <= start, possible_imputed_end flag) and compute D-05 reform dates into data/processed/reform_dates.csv.
 Done when: zero invariant violations; label tests pass; `inspect` prints records,
-episodes and labels for any unit-day.
+episodes and labels for any unit-day. reform_dates.csv covers all 23 units.
 
 ## T03 Exploratory analysis
 Scope: `notebooks/01_eda.ipynb` importing from `alerts/`: all-unit daily duration over

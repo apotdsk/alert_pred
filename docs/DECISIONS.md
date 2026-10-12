@@ -32,3 +32,30 @@ alert reporting, not in attack tactics; tactics are model C2's subject.
 Use pandas 2.0, NumPy 1.24, matplotlib 3.7, scikit-learn 1.3 and pytest 7.4 as the
 minimum supported versions. Reason: these versions support Python 3.11 and the APIs
 required by the specification while avoiding unnecessary upper bounds.
+
+## D-07 Primary source and imputed ends — Proposed
+Use `official_data_en.csv` as the primary source and keep `volunteer_data_en.csv` only
+as a separately audited comparison candidate; never merge them. The volunteer source
+starts earlier and has an explicit `naive` flag, but it is oblast-only and cannot supply
+the capital-level coverage required by SPEC §2. Flag volunteer ends only when
+`naive=True`; do not infer official imputation from an exact 30-minute duration because
+the official file supplies no imputation flag. Evidence: `outputs/data_audit.md` reports
+per-unit daily-minute correlation and mean absolute difference for complete overlapping
+months 2022-04 through 2026-08.
+
+## D-08 Episode merge tolerance — Proposed
+Use 60 seconds. Both audited candidates have second-level timestamps; a 60-second
+tolerance absorbs only a sub-minute reporting gap and retains the operational meaning
+of a longer all-clear.
+
+## D-09 Reporting reform dates — Proposed
+Use these first observed dates on which the configured capital is covered by a raion-
+or hromada-level official record: Cherkasy 2022-03-16; Chernihiv 2022-03-22;
+Chernivtsi 2022-06-07; Dnipro 2022-03-16; Donetsk/Kramatorsk 2022-03-15;
+Ivano-Frankivsk 2025-11-06; Kharkiv 2022-03-16; Kherson 2022-03-28;
+Khmelnytskyi 2022-03-15; Kropyvnytskyi 2022-03-16; Kyiv not observed; Lutsk
+2025-11-06; Lviv 2025-09-03; Mykolaiv 2022-03-16; Odesa 2022-03-16; Poltava
+2022-03-16; Rivne 2022-03-20; Sumy 2022-03-15; Ternopil 2025-11-06; Uzhhorod
+2025-11-06; Vinnytsia 2022-06-09; Zaporizhzhia 2022-03-16; Zhytomyr 2022-03-15.
+Reason: these dates use the accepted capital covering rule; the volunteer source is
+oblast-only and provides no reform evidence.

@@ -5,6 +5,8 @@ from __future__ import annotations
 import argparse
 from collections.abc import Sequence
 
+from alerts.data import build_audit
+
 
 STAGES = ("audit", "panel", "backtest", "forecast", "report")
 
@@ -30,7 +32,11 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     stages = (args.command,) if args.command else STAGES
     for stage in stages:
-        print(stage)
+        if stage == "audit":
+            build_audit(args.raw_path)
+            print("audit")
+        else:
+            print(stage)
     return 0
 
 

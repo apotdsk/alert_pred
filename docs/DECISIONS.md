@@ -66,3 +66,12 @@ Khmelnytskyi 2022-03-15; Kropyvnytskyi 2022-03-16; Kyiv not observed; Lutsk
 2025-11-06; Vinnytsia 2022-06-09; Zaporizhzhia 2022-03-16; Zhytomyr 2022-03-15.
 Reason: these dates use the accepted capital covering rule; the volunteer source is
 oblast-only and provides no reform evidence.
+
+## D-10 Exploratory summary population — Proposed
+Use complete unit-days only for exploratory summaries. Define the all-unit daily value
+as the mean across complete units on that date and annual values as the mean of those
+daily means. Define the endpoint comparison from each unit's final 28-day rolling mean;
+compare the four named frontline units with the median of all other units. Compare the
+all-unit mean for the 60 calendar days before and after the median non-missing D-05
+reform date. Reason: these definitions keep missing coverage out of descriptive values,
+weight dates equally, and make the reported trend and reform comparison reproducible.

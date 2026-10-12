@@ -11,6 +11,7 @@ VOLUNTEER_SOURCE_URL = ("https://raw.githubusercontent.com/Vadimkin/"
 RAW_DATA_PATH = Path("data/raw/official_data_en.csv")
 VOLUNTEER_RAW_DATA_PATH = Path("data/raw/volunteer_data_en.csv")
 AUDIT_PATH = Path("outputs/data_audit.md")
+EDA_NOTES_PATH = Path("outputs/eda_notes.md")
 FIGURES_DIR = Path("outputs/figures")
 PANEL_PATH = Path("data/processed/panel.csv")
 REFORM_DATES_PATH = Path("data/processed/reform_dates.csv")
